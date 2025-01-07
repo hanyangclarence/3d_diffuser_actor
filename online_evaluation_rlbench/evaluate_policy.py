@@ -9,6 +9,12 @@ import torch
 import numpy as np
 import tap
 
+import sys
+# Get the path to the repository root (assuming B and A are siblings)
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# Add the repository root to sys.path
+sys.path.append(repo_root)
+
 from diffuser_actor.keypose_optimization.act3d import Act3D
 from diffuser_actor.trajectory_optimization.diffuser_actor import DiffuserActor
 from utils.common_utils import (

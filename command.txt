@@ -1,0 +1,2 @@
+srun --gres=gpu:1 -w gpu42 -t 120 --pty /bin/bash
+
