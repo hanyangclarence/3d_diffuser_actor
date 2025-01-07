@@ -13,6 +13,7 @@ import transformers
 from tqdm.auto import tqdm
 import torch
 
+import os
 import sys
 # Get the path to the repository root (assuming B and A are siblings)
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
