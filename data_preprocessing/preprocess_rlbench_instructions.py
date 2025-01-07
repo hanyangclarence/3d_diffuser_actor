@@ -13,6 +13,12 @@ import transformers
 from tqdm.auto import tqdm
 import torch
 
+import sys
+# Get the path to the repository root (assuming B and A are siblings)
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# Add the repository root to sys.path
+sys.path.append(repo_root)
+
 from utils.utils_with_rlbench import RLBenchEnv, task_file_to_task_class
 
 
