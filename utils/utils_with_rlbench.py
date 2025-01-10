@@ -515,14 +515,14 @@ class RLBenchEnv:
             for step_id in range(max_steps):
 
                 # Fetch the current observation, and predict one action
-                rgb, pcd, gripper = self.get_rgb_pcd_gripper_from_obs(obs)
+                rgb, pcd, gripper = self.get_rgb_pcd_gripper_from_obs(obs)  # rgb: [1, 4, 4, 256, 256], pcd: [1, 4, 3, 256, 256], gripper: [1, 8]
                 rgb = rgb.to(device)
                 pcd = pcd.to(device)
                 gripper = gripper.to(device)
 
-                rgbs = torch.cat([rgbs, rgb.unsqueeze(1)], dim=1)
-                pcds = torch.cat([pcds, pcd.unsqueeze(1)], dim=1)
-                grippers = torch.cat([grippers, gripper.unsqueeze(1)], dim=1)
+                rgbs = torch.cat([rgbs, rgb.unsqueeze(1)], dim=1)  # [1, T, 4, 4, 256, 256]
+                pcds = torch.cat([pcds, pcd.unsqueeze(1)], dim=1)  # [1, T, 4, 3, 256, 256]
+                grippers = torch.cat([grippers, gripper.unsqueeze(1)], dim=1)  # [1, T, 8]
 
                 # Prepare proprioception history
                 rgbs_input = rgbs[:, -1:][:, :, :, :3]

@@ -56,7 +56,7 @@ def get_observation(task_str: str, variation: int,
     demos = env.get_demo(task_str, variation, episode)
     demo = demos[0]
 
-    key_frame = keypoint_discovery(demo)
+    key_frame = keypoint_discovery(demo)  # list[int], keyframe indices
     key_frame.insert(0, 0)
 
     keyframe_state_ls = []
@@ -64,8 +64,8 @@ def get_observation(task_str: str, variation: int,
     intermediate_action_ls = []
 
     for i in range(len(key_frame)):
-        state, action = env.get_obs_action(demo._observations[key_frame[i]]);
-        state = transform(state)
+        state, action = env.get_obs_action(demo._observations[key_frame[i]])  # state: dict, action: tensor (8)
+        state = transform(state)  # state: tensor (x, 256, 256);  x = num_cam * 3 (channel) * 2(rgb and pc are used);  24 when running the script
         keyframe_state_ls.append(state.unsqueeze(0))
         keyframe_action_ls.append(action.unsqueeze(0))
 
@@ -74,7 +74,7 @@ def get_observation(task_str: str, variation: int,
             for j in range(key_frame[i], key_frame[i + 1] + 1):
                 _, action = env.get_obs_action(demo._observations[j])
                 intermediate_actions.append(action.unsqueeze(0))
-            intermediate_action_ls.append(torch.cat(intermediate_actions))
+            intermediate_action_ls.append(torch.cat(intermediate_actions))  # intermediate_action: tensor (num_frames between two steps, 8)
 
     return demo, keyframe_state_ls, keyframe_action_ls, intermediate_action_ls
 
@@ -123,9 +123,9 @@ class Dataset(torch.utils.data.Dataset):
         state_ls = einops.rearrange(
             keyframe_state_ls,
             "t 1 (m n ch) h w -> t n m ch h w",
-            ch=3,
+            ch=3,  # channels, 3 for both rgb and pc
             n=len(args.cameras),
-            m=2,
+            m=2,  # rgb and pc are used, depth is not used
         )
 
         frame_ids = list(range(len(state_ls) - 1))

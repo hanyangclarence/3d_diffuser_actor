@@ -178,7 +178,7 @@ if __name__ == "__main__":
         collision_checking=bool(args.collision_checking)
     )
 
-    instruction = load_instructions(args.instructions)
+    instruction = load_instructions(args.instructions)  # Dict[task_name: str, instructions: Dict[variation: int, instruction_feature: torch.Tensor]]
     if instruction is None:
         raise NotImplementedError()
 
