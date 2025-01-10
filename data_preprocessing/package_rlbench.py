@@ -13,6 +13,13 @@ import numpy as np
 import einops
 from rlbench.demo import Demo
 
+import os
+import sys
+# Get the path to the repository root (assuming B and A are siblings)
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# Add the repository root to sys.path
+sys.path.append(repo_root)
+
 from utils.utils_with_rlbench import (
     RLBenchEnv,
     keypoint_discovery,

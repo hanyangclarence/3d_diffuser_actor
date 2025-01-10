@@ -406,7 +406,7 @@ def run_all_variations(i, lock, task_index, variation_count, results, file_lock,
             print('Process', i, 'finished')
             break
 
-        t = tasks[task_index.value]
+        t = tasks[task_index.value]  # t: <class 'rlbench.tasks.open_drawer.OpenDrawer'>
 
         task_env = rlbench_env.get_task(t)
         possible_variations = task_env.variation_count()
@@ -435,13 +435,13 @@ def run_all_variations(i, lock, task_index, variation_count, results, file_lock,
             while attempts > 0:
                 try:
                     #variation = np.random.randint(possible_variations)
-                    variation = pickle.load(
+                    variation = pickle.load(   # int, number of variation
                         open(
                             os.path.join(existing_episode_path, VARIATION_NUMBER),
                             'rb'
                         )
                     )
-                    existing_demo = pickle.load(
+                    existing_demo = pickle.load(  # rlbench.demo.Demo
                         open(
                             os.path.join(existing_episode_path, LOW_DIM_PICKLE),
                             'rb'
@@ -450,7 +450,7 @@ def run_all_variations(i, lock, task_index, variation_count, results, file_lock,
                     random_seed_state = existing_demo.random_seed
                     task_env = rlbench_env.get_task(t)
                     task_env.set_variation(variation)
-                    descriptions, obs = task_env.reset()
+                    descriptions, obs = task_env.reset()  # descriptions: list of str, obs: rlbench.backend.observation.Observation
 
                     print('Process', i, '// Task:', task_env.get_name(),
                           '// Variation:', variation, '// Demo:', ex_idx)
