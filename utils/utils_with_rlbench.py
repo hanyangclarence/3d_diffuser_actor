@@ -509,7 +509,7 @@ class RLBenchEnv:
             # cam_motion = CircleCameraMotion(cam, Dummy('cam_cinematic_base'), 0.005)
             global_cam_motion = StaticCameraMotion(cam)
 
-            include_robot_cameras = True
+            include_robot_cameras = False
             
             cams_motion = {"global": global_cam_motion}
 
@@ -526,11 +526,13 @@ class RLBenchEnv:
                 cams_motion["left"] = left_cam_motion
                 cams_motion["right"] = right_cam_motion
                 cams_motion["wrist"] = wrist_cam_motion
-            tr = TaskRecorder(cams_motion, fps=30)
+            tr = TaskRecorder(cams_motion, fps=15)
             task._scene.register_step_callback(tr.take_snap)
             
             assert save_dir is not None
             os.makedirs(save_dir, exist_ok=True)
+
+            print(f"Finished setting up video recording at {save_dir}")
 
         success_rate = 0
         num_valid_demos = 0
