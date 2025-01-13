@@ -23,6 +23,10 @@ from rlbench.backend.exceptions import InvalidActionError
 from rlbench.demo import Demo
 from pyrep.errors import IKError, ConfigurationPathError
 from pyrep.const import RenderMode
+from pyrep.objects.dummy import Dummy
+from pyrep.objects.vision_sensor import VisionSensor
+
+from utils_with_recorder import TaskRecorder, StaticCameraMotion, CircleCameraMotion, AttachedCameraMotion
 
 
 ALL_RLBENCH_TASKS = [
@@ -421,7 +425,13 @@ class RLBenchEnv:
         dense_interpolation=False,
         interpolation_length=100,
         num_history=1,
+        record_video=False,
+        save_dir=None,
     ):
+        if record_video:
+            assert save_dir is not None
+            os.makedirs(save_dir, exist_ok=True)
+        
         self.env.launch()
         task_type = task_file_to_task_class(task_str)
         task = self.env.get_task(task_type)
@@ -451,7 +461,9 @@ class RLBenchEnv:
                     verbose=verbose,
                     dense_interpolation=dense_interpolation,
                     interpolation_length=interpolation_length,
-                    num_history=num_history
+                    num_history=num_history,
+                    record_video=record_video,
+                    save_dir=f"{save_dir}/{task_str}_variation{variation}"
                 )
             )
             if valid:
@@ -481,8 +493,44 @@ class RLBenchEnv:
         dense_interpolation=False,
         interpolation_length=50,
         num_history=0,
+        record_video: bool = False,
+        save_dir: str = None,
     ):
         device = actioner.device
+        
+        if record_video:
+            # Add a global camera to the scene
+            cam_placeholder = Dummy('cam_cinematic_placeholder')
+            cam_resolution = [480, 480]
+            cam = VisionSensor.create(cam_resolution)
+            cam.set_pose(cam_placeholder.get_pose())
+            cam.set_parent(cam_placeholder)
+
+            # cam_motion = CircleCameraMotion(cam, Dummy('cam_cinematic_base'), 0.005)
+            global_cam_motion = StaticCameraMotion(cam)
+
+            include_robot_cameras = True
+            
+            cams_motion = {"global": global_cam_motion}
+
+            if include_robot_cameras:
+                # Env cameras
+                cam_left = VisionSensor.create(cam_resolution)
+                cam_right = VisionSensor.create(cam_resolution)
+                cam_wrist = VisionSensor.create(cam_resolution)
+
+                left_cam_motion = AttachedCameraMotion(cam_left, task._scene._cam_over_shoulder_left)
+                right_cam_motion = AttachedCameraMotion(cam_right, task._scene._cam_over_shoulder_right)
+                wrist_cam_motion = AttachedCameraMotion(cam_wrist, task._scene._cam_wrist)
+
+                cams_motion["left"] = left_cam_motion
+                cams_motion["right"] = right_cam_motion
+                cams_motion["wrist"] = wrist_cam_motion
+            tr = TaskRecorder(cams_motion, fps=30)
+            task._scene.register_step_callback(tr.take_snap)
+            
+            assert save_dir is not None
+            os.makedirs(save_dir, exist_ok=True)
 
         success_rate = 0
         num_valid_demos = 0
@@ -608,6 +656,9 @@ class RLBenchEnv:
                 f"SR: {total_reward:.2f}/{demo_id+1}",
                 "# valid demos", num_valid_demos,
             )
+            
+            if record_video:
+                tr.save(f"{save_dir}/demo_{demo_id}")
 
         # Compensate for failed demos
         if num_valid_demos == 0:

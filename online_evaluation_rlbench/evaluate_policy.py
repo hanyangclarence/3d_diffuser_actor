@@ -8,6 +8,7 @@ import os
 import torch
 import numpy as np
 import tap
+import time
 
 import sys
 # Get the path to the repository root (assuming B and A are siblings)
@@ -39,7 +40,9 @@ class Arguments(tap.Tap):
     cameras: Tuple[str, ...] = ("left_shoulder", "right_shoulder", "wrist")
     image_size: str = "256,256"
     verbose: int = 0
-    output_file: Path = Path(__file__).parent / "eval.json"
+    # set the current time as the output filename
+    output_file: Path = Path(__file__).parent / f"rollout_{int(time.time())}"
+    record_video: int = 1
     max_steps: int = 25
     test_model: str = "3d_diffuser_actor"
     collision_checking: int = 0
@@ -157,7 +160,7 @@ if __name__ == "__main__":
     print(args)
     print("-" * 100)
     # Save results here
-    os.makedirs(os.path.dirname(args.output_file), exist_ok=True)
+    os.makedirs(args.output_file, exist_ok=True)
 
     # Seeds
     torch.manual_seed(args.seed)
@@ -206,7 +209,9 @@ if __name__ == "__main__":
             dense_interpolation=bool(args.dense_interpolation),
             interpolation_length=args.interpolation_length,
             verbose=bool(args.verbose),
-            num_history=args.num_history
+            num_history=args.num_history,
+            record_video=args.record_video,
+            save_dir=args.output_file,
         )
         print()
         print(
@@ -219,5 +224,5 @@ if __name__ == "__main__":
         )
 
         task_success_rates[task_str] = var_success_rates
-        with open(args.output_file, "w") as f:
+        with open(os.path.join(args.output_file, "results.json"), "w") as f:
             json.dump(round_floats(task_success_rates), f, indent=4)
