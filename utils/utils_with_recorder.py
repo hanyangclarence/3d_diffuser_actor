@@ -72,7 +72,7 @@ class TaskRecorder(object):
         import cv2
         for cam_name, cam_motion in self._cams_motion.items():
             video = cv2.VideoWriter(
-                    str(path / f"{cam_name}.avi"), cv2.VideoWriter_fourcc('m', 'p', '4', 'v'), self._fps,
+                    str(path / f"{cam_name}.mp4"), cv2.VideoWriter_fourcc('M', 'P', '4', 'V'), self._fps,
                     tuple(cam_motion.cam.get_resolution()))
             for image in self._snaps[cam_name]:
                 video.write(cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
