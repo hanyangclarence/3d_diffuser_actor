@@ -41,7 +41,7 @@ class Arguments(tap.Tap):
     image_size: str = "256,256"
     verbose: int = 0
     # set the current time as the output filename
-    output_file: Path = Path(__file__).parent / f"rollout_{int(time.time())}"
+    output_file: Path = f"eval_logs/rollout_{int(time.time())}"
     record_video: int = 1
     max_steps: int = 25
     test_model: str = "3d_diffuser_actor"

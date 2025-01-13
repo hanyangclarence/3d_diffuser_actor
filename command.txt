@@ -2,7 +2,7 @@ srun --gres=gpu:1 -w gpu42 -t 120 --pty /bin/bash
 srun --qos=gpu -p gpu_24h --gres=gpu:1 -w gpu42 --pty /bin/bash
 
 eval:
-CUDA_LAUNCH_BLOCKING=1 xvfb-run python online_evaluation_rlbench/evaluate_policy.py --tasks stack_blocks --checkpoint train_logs/diffuser_actor_peract.pth --test_model 3d_diffuser_actor --cameras "left_shoulder,right_shoulder,wrist,front" --verbose 1 --data_dir ./data/peract/raw/test/ --num_episodes 100 --output_file eval_logs/3d_diffuser_actor/seed0/stack_blocks.json --instructions instructions/peract/instructions.pkl --variations 0 --max_tries 2 --seed 0 --gripper_loc_bounds_file tasks/18_peract_tasks_location_bounds.json --quaternion_format wxyz 
+CUDA_LAUNCH_BLOCKING=1 xvfb-run python online_evaluation_rlbench/evaluate_policy.py --tasks stack_blocks --checkpoint train_logs/diffuser_actor_peract.pth --test_model 3d_diffuser_actor --cameras "left_shoulder,right_shoulder,wrist,front" --verbose 1 --data_dir ./data/peract/raw/test/ --num_episodes 100 --instructions instructions/peract/instructions.pkl --variations 0 --max_tries 2 --seed 0 --gripper_loc_bounds_file tasks/18_peract_tasks_location_bounds.json --quaternion_format wxyz 
 
 
 
